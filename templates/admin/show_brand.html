@@ -1,0 +1,74 @@
+{% extends "admin/admin_dsh.html" %}
+{% block main %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Admin Brand View</title>
+    <style>
+        /* Add your CSS styles for a nice layout here */
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: flex-start; /* Change from "center" to "flex-start" */
+            height: 100vh;
+            margin: 0;
+        }
+
+        .category-box {
+            border: 1px solid #ccc;
+            padding: 70px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        table {
+            width: 100%;
+        }
+        
+        table th {
+            background-color: #f2f2f2;
+        }
+        
+        table th, table td {
+            padding: 10px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="category-box">
+        <h1>Brand Management</h1>
+
+        <!-- Display Categories in a Table -->
+        <table>
+            <thead>
+                <tr>
+                    <th>Brand Name</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            {% for brd in brand %}
+            <tbody>
+                <!-- Categories will be displayed here dynamically -->
+                <tr>
+                    <td>{{ brd.title }}</td>
+                    <td>
+                        <a href="{% url 'edit_brand' brd.id %}" class="btn btn-success">Edit</a>
+                    </td>
+                    <td>
+                        {% if brd.active %}
+                            <a href="{% url 'brand_action' brd.id %}" class="btn btn-success"> Available</a>
+                        {% else %}
+                            <a href="{% url 'brand_action' brd.id %}" class="btn btn-danger">Not Available</a>
+                        {% endif %}
+                    </td>
+                </tr>
+            </tbody>
+            {% endfor %}
+        </table>
+
+        <p><a href="{% url 'add_brand' %}" class="btn btn-success">Add brand</a></p>
+    </div>
+</body>
+</html>
+{% endblock main %}

@@ -1,0 +1,53 @@
+<!-- templates/wallet/view_wallet.html -->
+{% extends "app/base.html" %}
+{% load static %}
+
+{% block title %}
+  Wallet
+{% endblock title %} 
+
+{% block main-content %}  
+<section class="h-100 gradient-custom shadow">
+    <div class="container py-5 h-100">
+        <div class="row d-flex justify-content-center align-items-center h-100">
+            <div class="col-lg-10 col-xl-8">
+                <div class="card shadow" style="border-radius: 10px;">
+                    <div class="card-header px-4 py-5">
+                        <h5 class="text-muted mb-0">Available Balance, ₹{{ wallet.balance }}</h5>
+                    </div>
+                    <div class="card-body">
+                        <h3 class="card-subtitle mb-2 text-muted text-center"><b>Wallet History</b></h3>
+                        <hr>
+                        
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>No</th>
+                                    <th>Transaction Type</th>
+                                    <th>Amount</th>
+                                    <th>Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for history in wallet_history %}
+                                    <tr>
+                                        <td>{{ forloop.counter }}</td>
+                                        <td>{{ history.transaction_type }}</td>
+                                        {% if history.transaction_type == 'debit' %}
+                                        <td style="color: red;">₹{{ history.amount }}</td>
+                                        {% else %}
+                                        <td style="color: green;">₹{{ history.amount }}</td>
+                                        {% endif %}
+                                        <td>{{ history.timestamp }}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                        
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,30 @@
+<!-- edit_banner.html -->
+{% extends "admin/admin_dsh.html" %}
+{% load crispy_forms_tags %}
+{% block main %}
+<div class="container">
+    <h1>Edit Your Banner</h1>
+
+    <form method="post" action="{% url 'edt_banner_action' %}" class="border border-dark rounded p-4"
+        enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form|crispy }}
+        <input type="hidden" value="{{ banners.id }}" name="brand_id">
+        <div class="text-right mt-3">
+            <button type="submit" class="btn btn-success">Edit banner</button>
+        </div>
+    </form>
+</div>
+<script>
+    {% if messages %}
+    document.addEventListener('DOMContentLoaded', function () {
+        {% for message in messages %}
+        Swal.fire({
+            icon: '{{ message.tags }}',
+            title: '{{ message }}',
+        });
+        {% endfor %}
+    });
+    {% endif %}
+</script>
+{% endblock main %}

@@ -1,0 +1,78 @@
+{% extends "app/base.html" %}
+{% load static %}
+{% block title %}
+Shopping Cart
+{% endblock title %}
+
+{% block main-content %}
+<div class="container">
+  <div class="row justify-content-center mt-5">
+    <div class="col-md-4 shadow p-3 mb-5 bg-white rounded">
+      <form method="post" action="{% url 'payment:basket_view' %}">
+
+        {% csrf_token %}
+        <h3 class="mb-3">Billing address</h3>
+        <!-- Error messages in this element -->
+
+        <div class="row g-3">
+          <div class="col-md-7">
+            <label for="custName" class="form-label">Customer Name</label>
+            <input type="text" class="form-control" name="custName" id="custName" pattern="^(?!\s+$)[a-zA-Z0-9\s]+$"
+              required>
+            <div class="invalid-feedback">
+              Please enter a valid customer name (only alphanumeric characters and at least one non-space character
+              allowed).
+            </div>
+          </div>
+
+          <!-- Add similar styling for the rest of the form fields -->
+          <div class="col-12">
+            <label for="address" class="form-label">Address</label>
+            <input type="text" class="form-control" id="custAdd" name="custAdd" pattern="^[a-zA-Z0-9\s,()]+$" required>
+            <div class="invalid-feedback">
+              Please enter a valid shipping address.
+            </div>
+          </div>
+          <div class="col-12">
+            <label for="address2" class="form-label">Phone Number</label>
+            <input type="text" class="form-control" id="custAdd2" name="phone" pattern="^\d+$" minlength="10" required>
+            <div class="invalid-feedback">
+              Please enter a valid phone number (only numeric characters with a minimum length of 10 digits allowed).
+            </div>
+          </div>
+
+          <div class="col-mod-5">
+            <label for="country" class="form-label">State</label>
+            <select class="form-select" name="state" id="country" required>
+              <option value="state">Choose..</option>
+              <option>kerala</option>
+            </select>
+            <div class="invalid-feedback">
+              Please select a valid State.
+            </div>
+          </div>
+          <!-- ... -->
+
+          <div class="col-md-3">
+            <label for="postCode" class="form-label">Pincode</label>
+            <input type="text" class="form-control" id="postCode" name="pincode" pattern="^\d+$" required>
+            <div class="invalid-feedback">
+              Zip code required (only numeric characters allowed).
+            </div>
+          </div>
+        </div>
+
+        <hr class="my-4">
+        <button id="submit" class="btn btn-primary w-100 fw-bold" data-secret="{{ client_secret }}">Add</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+  var STRIPE_PUBLISHABLE_KEY = '{{STRIPE_PUBLISHABLE_KEY}}'
+  var CSRF_TOKEN = '{{ csrf_token }}';
+</script>
+<script src="https://js.stripe.com/v3/"></script>
+<script src="{% static 'payment/index.js' %}" data-rel-js></script>
+{% endblock %}

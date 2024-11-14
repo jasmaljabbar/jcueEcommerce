@@ -1,0 +1,38 @@
+<!-- return_requests_admin.html -->
+{% extends "admin/admin_dsh.html" %}
+{% block main %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title text-center">Admin Return Requests</h5>
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Order ID</th>
+                                <th>Customer</th>
+                                <th>Request Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for return_request in return_requests %}
+                            <tr>
+                                <td>{{ return_request.order.id }}</td>
+                                <td>{{ return_request.order.full_name }}</td>
+                                <td>{{ return_request.admin_response|default:"Pending" }}</td>
+                                <td>
+                                    <a href="{% url 'admin_handle_return_request' return_request.id %}"
+                                        class="btn btn-primary">Handle Request</a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

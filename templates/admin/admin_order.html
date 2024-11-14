@@ -1,0 +1,116 @@
+{% extends "admin/admin_dsh.html" %}
+{% block main %}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title text-center">Order History</h5>
+
+                    <!-- Add Search Field -->
+                    <div class="mb-3">
+                        <input type="text" class="form-control" id="searchInput" placeholder="Search by customer name">
+                    </div>
+
+                    <!-- Add Order Status Filter -->
+                    <div class="mb-3">
+                        <label for="orderStatusFilter" class="form-label">Filter by Order Status:</label>
+                        <select class="form-select" id="orderStatusFilter">
+                            <option value="" selected>All</option>
+                            {% for status, _ in orders.0.ORDER_STATUS_CHOICES %}
+                            <option value="{{ status }}">{{ status }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Order Id</th>
+                                <th>Customers</th>
+                                <th>Order Status</th>
+                                <th>Date</th>
+                                <th>Payment Status</th>
+                                <th>Total Amount</th>
+                                <th>View</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% if orders %}
+                            {% for order in orders %}
+                            <tr data-customer-name="{{ order.full_name }}" data-order-status="{{ order.status }}">
+                                <td>{{ order.id }}</td>
+                                <td>{{ order.full_name }}</td>
+                                <td>
+                                    {% if order.status == 'canceled' or order.status == 'rejected' %}
+                                    <p>canceled</p>
+                                    {% else %}
+                                    <form action="{% url 'order' %}" method="post">
+                                        {% csrf_token %}
+                                        <select name="status" id="status_{{ order.id }}">
+                                            {% for status, _ in order.ORDER_STATUS_CHOICES %}
+                                            <option value="{{ status }}" {% if order.status == status %} selected {% endif %}>
+                                                {{ status }} </option> 
+
+                                            {% endfor %}
+                                        </select>
+                                        <input type="hidden" name="orderId" value="{{ order.id }}">
+                                        <button type="submit">Update Status</button>
+                                    </form>
+                                    {% endif %}
+                                </td>
+                                <td>{{ order.created }}</td>
+                                <td>{{ order.billing_status }}</td>
+                                <td>₹{{ order.total_paid }}</td>
+                                <td><a class="btn btn-Primary" href="{% url 'order_details' order.id %}">View</a></td>
+                            </tr>
+                            {% endfor %}
+                            {% else %}
+                            <tr>
+                                <td colspan="7">No orders found.</td>
+                            </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<script>
+    $(document).ready(function () {
+        // Add filtering based on search input and order status
+        $('#searchInput, #orderStatusFilter').on('input change', function () {
+            var searchText = $('#searchInput').val().toLowerCase();
+            var selectedOrderStatus = $('#orderStatusFilter').val();
+
+            $('tbody tr').each(function () {
+                var customerName = $(this).data('customer-name').toLowerCase();
+                var orderStatus = $(this).data('order-status');
+
+                var matchSearch = customerName.includes(searchText) || searchText === '';
+                var matchOrderStatus = selectedOrderStatus === '' || orderStatus === selectedOrderStatus;
+
+                if (matchSearch && matchOrderStatus) {
+                    $(this).show();
+                } else {
+                    $(this).hide();
+                }
+            });
+
+            // Show/hide the "No orders found" message based on the number of visible rows
+            var visibleRows = $('tbody tr:visible').length;
+
+            if (visibleRows === 0) {
+                $('tbody tr.no-orders-message').show();
+            } else {
+                $('tbody tr.no-orders-message').hide();
+            }
+        });
+    });
+</script>
+
+{% endblock %}

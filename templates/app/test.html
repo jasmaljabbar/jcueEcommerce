@@ -1,0 +1,190 @@
+<%- include('./partial/header') %>
+
+<section class="bg-white my-5">
+  <div class="container">
+    <div class="row">
+      <!-- cart -->
+      <div class="col-lg-9">
+        <div class="card border rounded shadow">
+          <div class="m-4 rounded shadow-5">
+            <h4 class="card-title mb-4">Your shopping cart</h4>
+            <% if (Array.isArray(product) && product.length > 0) { %>
+            <% product.forEach((x) => { %>
+            <div class="row gy-3 mb-4">
+              <div class="col-lg-5">
+                <div class="me-lg-5">
+                  <div class="d-flex">
+                    <% if (x.productId && x.productId.images && Array.isArray(x.productId.images) && x.productId.images.length > 0) { %>
+                    <img src="/product-image/<%= x.productId.images[0] %>" class="border rounded me-3"
+                      style="width: 85px; height: 60px;" />
+                    <% } else { %>
+                    <img src="#" class="border rounded me-3" style="width: 96px; height: 96px" />
+                    <% } %>
+                    <div class="">
+                      <a href="#" class="nav-link">
+                        <h6><%= x.productId.ProductName %></h6>
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-lg-2 col-sm-6 col-6 d-flex align-items-center justify-content-between">
+                <button class="btn btn-light border" type="button" onclick="decrementQuantity('<%= x.productId._id %>','<%= newcart._id %>')">
+                  <i class="fas fa-minus"></i>
+                </button>
+                <input class="form-control text-center quantity-input" type="text" value="<%= x.quantity %>"
+                  id="quantity-<%= x.productId._id %>" readonly />
+                <button class="btn btn-light border" type="button" onclick="incrementQuantity('<%= x.productId._id %>','<%= newcart._id %>')">
+                  <i class="fas fa-plus"></i>
+                </button>
+              </div>
+              <div class="col-lg-2">
+                <text class="h6">₹<%= x.productId.DiscountAmount %></text>
+                <br />
+              </div>
+              <div class="col-lg col-sm-6 d-flex justify-content-sm-center justify-content-md-start justify-content-lg-center justify-content-xl-end mb-2">
+                <div class="float-md-end">
+                  <a href="#" id="removeCart" class="btn btn-light border text-danger icon-hover-danger icon-hover-shadow"
+                    onclick="removeFromCart('<%= x.productId._id %>','<%= newcart._id %>')"> Remove</a>
+                </div>
+              </div>
+            </div>
+            <% }) %>
+          
+          </div>
+        </div>
+      </div>
+      <!-- cart -->
+      <!-- summary -->
+      <div class="col-lg-3">
+        <div class="card mb-3 border shadow">
+          <div class="card-body">
+            <form>
+              <div class="form-group">
+                <label class="form-label">Have coupon?</label>
+                <div class="input-group">
+                  <input type="text" class="form-control border" name="" placeholder="Coupon code" />
+                  <button class="btn btn-light border">Apply</button>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+        <div class="card shadow border">
+          <div class="card-body">
+            <div class="d-flex justify-content-between">
+              <p class="mb-2">Total Quantity:</p>
+              <p class="mb-2"><%= totalQuantity %></p>
+            </div>
+            <div class="d-flex justify-content-between">
+              <p class="mb-2">Total price:</p>
+              <p class="mb-2">₹<%= subtotal %></p>
+            </div>
+            <div class="d-flex justify-content-between">
+              <p class="mb-2">Discount:</p>
+              <p class="mb-2 text-success">-₹</p>
+            </div>
+            <div class="d-flex justify-content-between">
+              <p class="mb-2">TAX:</p>
+              <p class="mb-2">₹ <%= gstAmount %></p>
+            </div>
+            <hr />
+            <div class="d-flex justify-content-between">
+              <p class="mb-2">Total price:</p>
+              <p class="mb-2 fw-bold">₹<%= total %></p>
+            </div>
+            <div class="mt-3">
+              <a href="/user/toCheckout" class="btn btn-success w-100 shadow-0 mb-2"> Make Purchase </a>
+              <a href="/user/home" class="btn btn-light w-100 border mt-2"> Back to shop </a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <% } else { %>
+        <h3>cart is empty</h3>
+        <% } %>
+      <!-- summary -->
+    </div>
+  </div>
+
+</section>
+
+<script>
+  
+  function removeFromCart(productId, cartId) {
+    if (confirm("Are you sure you want to remove this item from your cart?")) {
+      fetch('/user/removeFromCart/' + productId, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          productId: productId,
+          cartId: cartId,
+        }),
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          if (data.success) {
+            // Reload the page or update the cart UI as needed
+            window.location.reload();
+          } else {
+            console.error('Error removing product from the cart:', data.message);
+          }
+        })
+        .catch((error) => {
+          console.error('Error removing product from the cart:', error);
+        });
+    }
+  }
+
+  function updateQuantity(productId, count, cartId) {
+    var quantityElement = document.getElementById("quantity-" + productId);
+    var currentQuantity = parseInt(quantityElement.value, 10);
+
+    if (count === 1) {
+      currentQuantity += 1;
+      quantityElement.value = currentQuantity;
+    } else if (count === -1 && currentQuantity > 1) {
+      currentQuantity -= 1;
+      quantityElement.value = currentQuantity;
+    }
+
+    fetch('/updatequantity', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        productId: productId,
+        quantity: currentQuantity,
+        cartId: cartId,
+      })
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        window.location.reload();
+
+      })
+      .catch((error) => {
+        console.error('Error updating quantity:', error);
+        window.location.reload();
+      });
+  }
+
+  function decrementQuantity(productId, cartId) {
+    updateQuantity(productId, -1, cartId);
+  }
+
+  function incrementQuantity(productId, cartId) {
+    updateQuantity(productId, 1, cartId);
+  }
+  function updateCartUI() {
+    var cartEmpty =` <%= product.length === 0 %>`;
+
+    if (cartEmpty) {
+      document.querySelector('.btn-success').disabled = true;
+    }
+  }
+  updateCartUI();
+</script>

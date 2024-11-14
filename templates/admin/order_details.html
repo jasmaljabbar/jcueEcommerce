@@ -1,0 +1,119 @@
+{% extends "admin/admin_dsh.html" %}
+{% block main %}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title text-center">Order Detail - Order ID: {{ orders.id }}</h5>
+
+                    <p>Order Date: {{ orders.created }}</p>
+                    <p>Total Amount: ₹{{ orders.total_paid }}</p>
+
+                    <h6 class="mt-4">Customer Information:</h6>
+                    <p>Customer Name: {{ orders.full_name }}</p>
+                    <p>payment Method: {{ orders.billing_status }}</p>
+                   
+
+                    <h6 class="mt-4">Order Items:</h6>
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Product</th>
+                                <th>Photo</th>
+                                <th>Price</th>
+                                <th>Quantity</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in orders.items.all %}
+                            <tr>
+                                <td>{{ item.product.title }}</td>
+                                <td>
+                                    <img src="{{ item.product.image1.url }}" alt="{{ item.product.name }}"
+                                        style="max-width: 50px; max-height: 50px;">
+                                </td>
+                                <td>₹{{ item.product.price }}</td>
+                                <td>{{ item.quantity }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+
+                    <p>Status: <span
+                            class="{% if order.status == 'canceled' %}text-danger{% endif %}">{{orders.get_status_display}}</span>
+                    </p>
+
+
+
+                    {% if orders.status == 'confirmed' %}
+
+                    <form method="post" action="{% url 'order_rejected' orders.id %}">
+                        {% csrf_token %}
+                        <input type="submit" id="cancel-order"
+                            onclick="return confirm('Do you want to cancel this order?');" value="Reject Order"
+                            class="btn btn-danger">
+                    </form>
+                    {% elif order.status == 'canceled' %}
+                    <p class="text-danger">This order has been canceled.</p>
+                    {% elif order.status == 'rejected' %}
+                    rejected
+                    {% endif %}
+
+
+                    {% if return_request %}
+                    <h6 class="mt-4">Return Request Status:</h6>
+                    <p>Return Request: {{ return_request.admin_response|default:"Pending" }}</p>
+                    <button type="button" class="btn btn-primary" data-bs-toggle="modal"
+                        data-bs-target="#viewReasonModal">
+                        View User's Reason
+                    </button>
+
+
+
+                    <div class="modal fade" id="viewReasonModal" tabindex="-1" role="dialog"
+                        aria-labelledby="viewReasonModalLabel" aria-hidden="true">
+                        <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="viewReasonModalLabel">User's Reason for Return</h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                                    {% if return_request %}
+                                    <p>{{ return_request.user_reason|default:"No reason provided by the user." }}</p>
+                                    {% else %}
+                                    <p>No return request available.</p>
+                                    {% endif %}
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+
+                                    {% if return_request %}
+                                    {% if not return_request.admin_response %}
+
+                                    <form method="post" action="{% url 'handle_return_request' return_request.id %}">
+                                        {% csrf_token %}
+                                        <button type="submit" name="response" value="accepted"
+                                            class="btn btn-success">Accept</button>
+                                        <button type="submit" name="response" value="rejected"
+                                            class="btn btn-danger">Reject</button>
+                                    </form>
+                                    {% endif %}
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,374 @@
+{% extends "app/base.html" %}
+{% load static %}
+{% block title %}
+Home
+{% endblock title %}
+
+{% block banner_slider %}
+<div id="carouselExample" class="carousel slide">
+  <div class="carousel-inner">
+    {% for banner in active_banners %}
+    <div class="carousel-item {% if forloop.first %}active{% endif %}">
+      <a href="{{ banner.link }}">
+        <img src="{{ banner.image.url }}" class="d-block w-100" alt="{{ banner.title }}">
+      </a>
+    </div>
+    {% endfor %}
+  </div>
+  <button class="carousel-control-prev" type="button" data-bs-target="#carouselExample" data-bs-slide="prev">
+    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+    <span class="visually-hidden">Previous</span>
+  </button>
+  <button class="carousel-control-next" type="button" data-bs-target="#carouselExample" data-bs-slide="next">
+    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+    <span class="visually-hidden">Next</span>
+  </button>
+
+</div>
+{% endblock banner_slider %}
+
+
+{% block main-content %}
+<style>
+  body {
+    text-align: center;
+    overflow-x: hidden;
+    font-family: 'Noto Sans JP', sans-serif;
+  }
+
+  .badge {
+    position: absolute;
+    left: 0;
+    top: 20px;
+    text-transform: uppercase;
+    font-size: 13px;
+    font-weight: 700;
+    background: #6E6E6E;
+    color: #BCFD4C;
+    padding: 3px 10px;
+  }
+
+  .image-container {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+  }
+
+  .image-item {
+    margin: 10px;
+    text-align: center;
+  }
+
+  .image-button {
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    cursor: pointer;
+    overflow: hidden;
+    max-width: 80px;
+  }
+
+  .image-button img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+    transition: transform 0.3s ease-in-out;
+  }
+
+  .wishlist-icon {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 24px;
+
+    cursor: pointer;
+  }
+
+  .image-button:hover img {
+    transform: scale(1.1);
+  }
+
+  .image-name {
+    margin-top: 5px;
+    font-size: 12px;
+  }
+
+  .container {
+    margin-top: 30px;
+  }
+
+  .product-card {
+    background-color: #f5f6fa;
+    border-radius: 10px;
+    color: #2f3640;
+    margin: 0 2em;
+    transition: all linear .2s;
+    width: 250px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    position: relative;
+    height: 350px;
+    /* Increased height */
+  }
+
+  .product-card:hover,
+  .product-card:active {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    transform: scale(1.05);
+  }
+
+  .product-img {
+    border-radius: 10px;
+    height: 250px;
+    /* Increased height */
+    max-width: 100%;
+    background-size: cover;
+    background-position: center;
+    transition: transform 0.3s ease-in-out;
+  }
+
+  .product-card:hover .product-img {
+    transform: scale(1.1);
+  }
+
+  .product-details {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 1em;
+    text-align: center;
+    background-color: rgba(255, 255, 255, 0.9);
+  }
+
+  .product-details h4 {
+    font-size: 16px;
+    margin-bottom: 10px;
+  }
+
+  .product-cart button {
+    border: 0;
+    border-radius: 0 0 10px 10px;
+
+    cursor: pointer;
+    font-family: inherit;
+    padding: 1em;
+    text-transform: uppercase;
+
+    width: 100%;
+    transition: background-color 0.3s ease-in-out;
+  }
+
+  .product button:hover {
+    background-color: #2980b9;
+    font-weight: 500;
+    letter-spacing: .1em;
+  }
+
+
+  .best-icon {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    font-size: 24px;
+
+    cursor: pointer;
+  }
+
+  .fa-star,
+  .fa-heart {
+    margin-right: 5px;
+  }
+
+  .product_sale {
+    position: absolute;
+    z-index: 99;
+    right: 0;
+    -webkit-transform: rotate(45deg);
+    -moz-transform: rotate(45deg);
+    transform: rotate(-45deg);
+    left: -170px;
+    top: 18px;
+  }
+
+  .product_sale p {
+    margin: 0;
+    color: #fff;
+    background: #ff0000;
+    padding: 3px 25px;
+    box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.4);
+  }
+</style>
+
+<div class="image-container">
+  {% for category in cat %}
+  <div class="image-item">
+    <a class="image-button" href="{% url 'category_search' category.id %}">
+      <img src="{{ category.image.url }}" alt="{{ category.title }}" style="width: 90pxx; height: 60px;">
+    </a>
+    <p class="image-name">{{ category.title }}</p>
+  </div>
+  {% endfor %}
+</div>
+
+
+
+<div class="container p-5">
+
+  <div class="row">
+    {% for best_seller in best_sellers %}
+    <div class="col-md-3 col-sm-6 mb-4">
+      <div class="product-card">
+        <div class="product-img">
+          <!-- <i class="fa-solid fa-star best-icon" style="color: #d8d341;"></i> -->
+          <div class="product_sale">
+            <p>Best Sale</p>
+          </div>
+          {% if best_seller.id in user_wishlist %}
+          <a href="{% url 'basket:add_to_wishlist' best_seller.id %}">
+            <i class="fas fa-heart wishlist-icon " style="color: red;"></i>
+          </a>
+          {% else %}
+          {% if request.user.is_authenticated %}
+          <a href="{% url 'basket:add_to_wishlist' best_seller.id %}">
+            {% endif %}
+            <i class="fas fa-heart wishlist-icon"></i>
+          </a>
+          {% endif %}
+          <a href="{% url 'view_product' best_seller.id %}">
+            <img src="{{ best_seller.image1.url }}" class="card-img-top" alt="{{ best_seller.title }}">
+
+          </a>
+        </div>
+        <div class="product-details">
+          <h4>{{ best_seller.title }}</h4>
+          <div class="product-cart">
+            {% if best_seller.stock > 0 %}
+            <div class="product-cart">
+              {% if best_seller.id|add:0 in user_basket %}
+              <a href="{% url 'basket:basket_summary' %}">
+                <button type="button" class="btn btn-primary">Go to Cart</button>
+              </a>
+              {% else %}
+              <button type="button" class="add-to-cart-button btn btn-primary" data-productid="{{ best_seller.id }}">Add
+                to Cart</button>
+              {% endif %}
+            </div>
+            {% else %}
+            <div class="product-cart">
+              <button class="btn-danger">Out of Stock</button>
+            </div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+
+  </div>
+</div>
+
+
+<div class="container p-5">
+  <div class="row">
+    {% for p in product %}
+    {% if p.active %}
+    <div class="col-md-3 col-sm-6 mb-4">
+      <div class="product-card">
+        {% if p.has_offer %}
+        <div class="badge">{{ p.offer_value }}% off</div>
+        {% endif %}
+        <div class="product-img">
+          {% if p.id in user_wishlist %}
+          <a href="{% url 'basket:add_to_wishlist' p.id %}">
+            <i class="fas fa-heart wishlist-icon" style="color: red;"></i>
+          </a>
+          {% else %}
+          {% if request.user.is_authenticated %}
+          <a href="{% url 'basket:add_to_wishlist' p.id %}">
+            {% endif %}
+            <i class="fas fa-heart wishlist-icon"></i>
+          </a>
+          {% endif %}
+
+          <a href="{% url 'view_product' p.id %}">
+            <img src="{{ p.image1.url }}" class="card-img-top" alt="{{ p.name }}">
+          </a>
+        </div>
+        <div class="product-details">
+          {% if p.old_price %}
+          <p class="text-capitalize">
+            ₹ {{ p.price }} <del><small>₹{{ p.old_price }}</small></del>
+          </p>
+          {% else %}
+          <p class="text-capitalize">₹ {{ p.price }}</p>
+          {% endif %}
+          <h4>{{ p.title }}</h4>
+          {% if p.stock > 0 %}
+          <div class="product-cart">
+            {% if p.id|add:0 in user_basket %}
+            <a href="{% url 'basket:basket_summary' %}">
+              <button type="button" class="btn btn-primary">Go to Cart</button>
+            </a>
+            {% else %}
+            <button type="button" class="add-to-cart-button btn btn-primary" data-productid="{{ p.id }}">Add to
+              Cart</button>
+            {% endif %}
+          </div>
+
+          {% else %}
+          <div class="product-cart">
+            <button class="btn-danger">Out of Stock</button>
+          </div>
+          {% endif %}
+        </div>
+
+      </div>
+    </div>
+    {% endif %}
+    {% endfor %}
+  </div>
+</div>
+
+
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script>
+  $(document).ready(function () {
+    $(".thumbnail-image").click(function () {
+      var newImageSrc = $(this).attr("src");
+      $(".selected-image").attr("src", newImageSrc);
+    });
+
+    $(".add-to-cart-button").click(function () {
+      var productId = $(this).data("productid");
+
+      $.ajax({
+        type: 'POST',
+        url: '{% url "basket:basket_add" %}',
+        data: {
+          productid: productId,
+          productqty: 1,
+          csrfmiddlewaretoken: "{{csrf_token}}",
+          action: 'post'
+        },
+        success: function (json) {
+          window.location.reload();
+          document.getElementById("basket-qty").innerHTML = json.qty;
+        },
+        error: function (xhr, errmsg, err) {
+          // Handle error if needed
+        }
+      });
+    });
+
+  });
+</script>
+
+<!-- ... (remaining code) ... -->
+
+{% endblock main-content %}

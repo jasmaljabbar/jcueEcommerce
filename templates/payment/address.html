@@ -1,0 +1,291 @@
+{% extends "app/base.html" %}
+{% load static %}
+
+{% block title %}
+User Address
+{% endblock title %}
+
+{% block main-content %}
+
+<div class="container shadow p-3 mb-5 bg-white rounded">
+  <div class="row">
+    <div id="messageContainer"></div>
+    <div class="col-md-8">
+      <h2>Your Addresses</h2>
+
+      <div class="col-md-12">
+        {% for address in billing_address %}
+        {% if address.flag %}
+        <div class="card mx-auto my-5" style="width: 18rem;">
+          <div class="card-body">
+            <h5 class="card-title">Address Information</h5>
+            <p class="card-text"><strong>Customer Name:</strong> {{ address.full_name }}</p>
+            <p class="card-text"><strong>Email:</strong> {{ address.user.email }}</p>
+            <p class="card-text"><strong>Address:</strong> {{ address.address1 }}</p>
+
+            <p class="card-text"><strong>State:</strong> {{ address.city }}</p>
+            <p class="card-text"><strong>Postcode:</strong> {{ address.post_code }}</p>
+
+            <div class="d-flex justify-content-between mt-3">
+              <!-- Edit button -->
+              <a href="{% url 'payment:edit_address' address.id %}" class="btn btn-warning btn-sm">Edit</a>
+
+              <!-- Delete button -->
+              {% if not address.flag %}
+              <a href="{% url 'payment:delete_address' address.id %}" class="btn btn-danger btn-sm">Delete</a>
+
+              <!-- Make active button -->
+              <a href="{% url 'payment:address_active' address.id %}" class="btn btn-primary btn-sm">Make Active</a>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+        {% endif %}
+        {% endfor %}
+
+        {% for address in billing_address %}
+        {% if not address.flag %}
+        <div class="card d-flex justify-content-between align-items-center" style="width: 18rem; margin-bottom: 10px;">
+          <div>
+            <p><strong>Customer Name:</strong> {{ address.full_name }}</p>
+            <p><strong>Email:</strong> {{ address.user.email }}</p>
+            <p><strong>Address:</strong> {{ address.address1 }}</p>
+            <p><strong>Address 2:</strong> {{ address.address2 }}</p>
+            <p><strong>State:</strong> {{ address.city }}</p>
+            <p><strong>Postcode:</strong> {{ address.post_code }}</p>
+            <!-- Add more fields as needed -->
+          </div>
+          <div class="d-flex">
+            <!-- Edit button -->
+            <a href="{% url 'payment:edit_address' address.id  %}" class="btn btn-warning btn-sm">Edit</a>
+            &nbsp;
+            <!-- Delete button -->
+            {% if not address.flag %}
+            <a href="{% url 'payment:delete_address' address.id %}" class="btn btn-danger btn-sm">Delete</a>
+            &nbsp;
+            <a href="{% url 'payment:address_active' address.id  %}" class="btn btn-primary btn-sm">Make active</a>
+            {% endif %}
+          </div>
+          <br>
+        </div>
+        {% endif %}
+        {% endfor %}
+        <a href="{% url 'payment:add_address' %}" class="btn btn-success btn-sm">Add Address</a>
+      </div>
+    </div>
+
+
+
+    <div class="col-md-4">
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title">Order Summary</h5>
+
+          <!-- Display cart items -->
+          <table class="table ">
+            <thead>
+              <tr>
+                <th scope="col">Image</th>
+                <th scope="col">Product Name</th>
+                <th scope="col">Price</th>
+
+              </tr>
+            </thead>
+            <tbody>
+              {% for item in basket %}
+              {% with product=item.product %}
+              <tr>
+                <!-- Small product image -->
+                <td>
+                  <img class="img-fluid mx-auto d-block" alt="Product Image" src="{{ product.image1.url }}"
+                    style="max-width: 50px; max-height: 50px;">
+                </td>
+
+                <!-- Product details -->
+                <td>
+                  <p>{{ product.title }}</p>
+                </td>
+
+                <!-- Price -->
+                <td>
+                  <p> ₹{{ product.price }}</p>
+
+                  <!-- Add your form here for delete action -->
+                </td>
+              </tr>
+              {% endwith %}
+              {% empty %}
+              <tr>
+                <td colspan="4">No items in the basket.</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+          <p>Subtotal: ₹{{ basket.get_subtotal_price }}</p>
+          <p>Shipping Price: ${{ shipping_price }}</p>
+          <p>Total: ₹{{ basket.get_total_price }}</p>
+
+          <p id="discountedTotal">Discounted Total: ₹{{ discounted_total }}</p>
+
+          <!-- Payment method radio buttons -->
+
+          {% if billing_address %}
+          <form action="{% url 'payment:address' %}" method="post">
+            {% csrf_token %}
+            {% if wallet_balance.balance >= basket.get_total_price  %}
+            <div class="form-check">
+              <input type="radio" class="form-check-input" id="bankPayment" name="paymentMethod" value="wallet">
+              <label class="form-check-label" for="bankPayment">Use your wallet</label>
+            </div>
+            {% endif %}
+            <div class="form-check">
+              <input type="radio" class="form-check-input" id="bankPayment" name="paymentMethod" value="UPI" required>
+              <label class="form-check-label" for="bankPayment">UPI</label>
+            </div>
+            <div class="form-check">
+              <input type="radio" class="form-check-input" id="codPayment" name="paymentMethod" value="cod" readonly>
+              <label class="form-check-label" for="codPayment">Cash on Delivery</label>
+            </div>
+            <br>
+            <button type="submit" class="btn btn-primary btn-block">Place Order</button>
+          </form>
+
+          {% else %}
+          <button type="button" onclick="selectAddress()" class="btn btn-primary btn-block">Place Order</button>
+          <br>
+          {% endif %}
+
+          <br>
+
+          <h2></h2>
+
+
+          <form id="couponForm">
+            {% csrf_token %}
+            <div class="input-group mb-3">
+              <input type="text" class="form-control" name="coupon_code" placeholder="Coupon Code"
+                aria-label="Coupon Code" aria-describedby="applyCoupon" required>
+              <div class="input-group-append">
+                <button class="btn btn-outline-secondary" type="submit" id="applyCoupon">Apply Coupon</button>
+              </div>
+
+              <div><a href="{% url 'remove_coupon' %}" class="btn btn-danger">Remove</a></div>
+
+            </div>
+          </form>
+          <div class="dropdown">
+            <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown"
+              aria-expanded="false">
+              {% if coupons %}
+              Available Coupons
+              {% endif %}
+            </button>
+            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+              {% if coupons %}
+              {% for coupon in coupons %}
+              <div class="dropdown-item">
+                {% if coupon.discount_type|lower == "fixed" %}
+                {{ coupon.code }} - RS {{ coupon.discount_value }} off
+                {% else %}
+                {{ coupon.code }} - {{ coupon.discount_value }} % off
+                {% endif %}
+
+              </div>
+              {% endfor %}
+              {% else %}
+              <span class="dropdown-item text-muted">No coupons available</span>
+              {% endif %}
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+  <script type="text/javascript" src="{% static 'checkout.js' %}"></script>
+  <script>
+
+
+    function selectAddress() {
+     
+      $.ajax({
+        url: '{% url "payment:address" %}',
+        method: 'GET',
+        success: function (response) {
+          if (response) {
+            const errorMessage = response.error_data.error
+                ? response.error_data.error
+                : response.error_data.detail;
+            Toastify({
+              text:  errorMessage,
+              duration: 2500,
+              close: true,
+              gravity: "top",
+              position: "center",
+              style: {
+                background: "red",
+                borderRadius: "5px"
+              },
+              onClick: function () { }
+            }).showToast();
+          }
+        },
+        error: function (errorResponse) {
+          console.error(errorResponse);
+        }
+      });
+    }
+
+    $(document).on('submit', '#couponForm', function (e) {
+      e.preventDefault();
+      $.ajax({
+        url: '{% url "coupon_action" %}',
+        method: 'POST',
+        headers: { "X-CSRFToken": "{{ csrf_token }}" },
+        data: $(this).serialize(),
+        success: function (response) {
+          if (response.success) {
+
+            $("#discountedTotal").text(`Discounted Total: $${response.discounted_total}`);
+            Toastify({
+              text: response.message,
+              duration: 2500,
+              close: true,
+              gravity: "top",
+              position: "center",
+              style: {
+                background: "green",
+                borderRadius: "5px"
+              },
+              onClick: function () { }
+            }).showToast();
+          } else {
+
+            Toastify({
+              text: response.message,
+              duration: 2500,
+              close: true,
+              gravity: "top",
+              position: "center",
+              style: {
+                background: "red",
+                borderRadius: "5px"
+              },
+              onClick: function () { }
+            }).showToast();
+          }
+        },
+        error: function (errorResponse) {
+          alert('please enter a valid value')
+          console.error(errorResponse);
+        }
+      });
+    });
+
+
+  </script>
+
+
+
+  {% endblock %}

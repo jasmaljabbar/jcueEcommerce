@@ -1,0 +1,32 @@
+<!-- user_message.html -->
+{% extends "admin/admin_dsh.html" %}
+{% block main %}
+
+
+<div class="container mt-4">
+    <h1 class="text-center">User Messages</h1>
+
+    <table class="table">
+        <thead class="thead-dark">
+            <tr>
+                <th scope="col">User</th>
+                <th scope="col">Message</th>
+                <th scope="col">Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for user in users %}
+            <tr>
+                <td>{{ user.user.username }}</td>
+                <td>{{ user.message }}</td>
+                <td>
+                    <a class="btn btn-primary" href="{% url 'view_message' user.id %}">View Message</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+
+{% endblock main %}

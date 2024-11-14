@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{% static 'app/css/admin_dash.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
+        integrity="sha512-z3gLpd7yknf1YoNbCzqRKc4qyor8gaKU1qmn+CShxbuBusANI9QpRohGBreCFkKxLhei6S9CQXFEbbKuqLg0DA=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="your-scripts.js"></script>
+
+    <title>Your Webpage Title</title>
+</head>
+
+<body>
+    <input type="checkbox" id="check">
+    <!--header area start-->
+    <header>
+        <label for="check">
+            <i class="fas fa-bars" id="sidebar_btn"></i>
+        </label>
+        <div class="left_area">
+            <img src="{% static 'app/images/Logo.png' %}" width="90" height="40" />
+        </div>
+        <div class="right_area">
+            <a href="{% url 'log_out' %}" class="logout_btn">Logout</a>
+        </div>
+    </header>
+    <!--header area end-->
+    <!--mobile navigation bar start-->
+
+    <!--mobile navigation bar end-->
+    <!--sidebar start-->
+    <div class="sidebar">
+        <div class="profile_info">
+            <img src="{% static 'app/images/admin.png' %}" class="profile_image" alt="">
+            <h4>Jasmal Ghazali</h4>
+        </div>
+        <a href="{% url 'dashboard' %}"><i class="fas fa-desktop"></i><span>Dashboard</span></a>
+        <a href="{% url 'show_product' %}"><i class="fa-solid fa-box-archive"
+                style="color: #ffffff;"></i><span>Product</span></a>
+        <a href="{% url 'user_messages' %}"><i class="fa-solid fa-message" style="color: #ffffff;"></i></i><span>user
+                message</span></a>
+        <a href="{% url 'show_category' %}"><i class="fa-solid fa-bars"
+                style="color: #ffffff;"></i><span>Categories</span></a>
+        <a href="{% url 'manage_coupons' %}"><i class="fa-solid fa-money-bill-1"
+                style="color: #ffffff;"></i></i><span>Coupon</span></a>
+        <a href="#"><i class="fa-solid fa-user-gear" style="color: #ffffff;"></i></i><span>Admins</span></a>
+        <a href="{% url 'show_user' %}  "><i class="fa-solid fa-user-group"
+                style="color: #ffffff;"></i><span>Customers</span></a>
+        <a href="{% url 'order' %} "><i class="fa-solid fa-cart-shopping"
+                style="color: #ffffff;"></i><span>Orders</span></a>
+        <a href="{% url 'category_offer' %}"><i class="fa-solid fa fa-tag fa-lg"
+                style="color: #ffffff;"></i><span>Offer</span></a>
+        <a href="{% url 'show_brand' %}"><i class="fa-solid fa-copyright"
+                style="color: #ffffff;"></i><span>Brands</span></a>
+        <a href="{% url 'banner' %}"><i class="fa-solid fa-flag" style="color: #ffffff;"></i><span>Banners</span></a>
+        <br><br>
+    </div>
+    <!--sidebar end-->
+    <div class="content">
+        {% block main %}
+
+        {% endblock main %}
+    </div>
+</body>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+    crossorigin="anonymous"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"
+    integrity="sha384-IQsoLXl5PILFhosVNubq5LC7Qb9DXgDA9i+tQ8Zj3iwWAwPtgFTxbJ8NT4GN1R8p"
+    crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.min.js"
+    integrity="sha384-cVKIPhGWiC2Al4u+LWgxfKTRIcfu0JTxR+EQDz/bgldoEyl4H0zUF0QKbrJ0EcQF"
+    crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+
+
+</html>
+
+<style>
+    body {
+        margin: 0;
+        padding: 0;
+        font-family: "Roboto", sans-serif;
+    }
+
+    header {
+        z-index: 1;
+        position: fixed;
+        background: #22242A;
+        width: calc(100% - 0%);
+        top: 0;
+        height: 70px;
+    }
+
+    .left_area h3 {
+        color: #fff;
+        margin: 0;
+        text-transform: uppercase;
+        font-size: 22px;
+        font-weight: 900;
+    }
+
+    .left_area span {
+        color: #19B3D3;
+    }
+
+    .logout_btn {
+        padding: 5px;
+        background: #19B3D3;
+        text-decoration: none;
+        float: right;
+        margin-top: -50px;
+        margin-right: 40px;
+        border-radius: 2px;
+        font-size: 15px;
+        font-weight: 600;
+        color: #fff;
+        transition: 0.5s;
+        transition-property: background;
+    }
+
+    .logout_btn:hover {
+        background: #0B87A6;
+    }
+
+    .sidebar {
+        z-index: 1;
+        top: 0;
+        background: #2f323a;
+        margin-top: 70px;
+        padding-top: 30px;
+        position: fixed;
+        left: 0;
+        width: 250px;
+        height: calc(100% - 9%);
+        transition: 0.5s;
+        transition-property: left;
+        overflow-y: auto;
+    }
+
+    .profile_info {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .sidebar .profile_info .profile_image {
+        width: 100px;
+        height: 111px;
+        border-radius: 100px;
+        margin-bottom: 10px;
+    }
+
+    .sidebar .profile_info h4 {
+        color: #ccc;
+        margin-top: 0;
+        margin-bottom: 20px;
+    }
+
+    .sidebar a {
+        color: #fff;
+        display: block;
+        width: 100%;
+        line-height: 60px;
+        text-decoration: none;
+        padding-left: 40px;
+        box-sizing: border-box;
+        transition: 0.5s;
+        transition-property: background;
+    }
+
+    .sidebar a:hover {
+        background: #19B3D3;
+    }
+
+    .sidebar i {
+        padding-right: 10px;
+    }
+
+    label #sidebar_btn {
+        z-index: 1;
+        color: #fff;
+        position: fixed;
+        cursor: pointer;
+        left: 300px;
+        font-size: 20px;
+        margin: 5px 0;
+        transition: 0.5s;
+        transition-property: color;
+    }
+
+    label #sidebar_btn:hover {
+        color: #19B3D3;
+    }
+
+    #check:checked~.sidebar {
+        left: -185px;
+    }
+
+    #check:checked~.sidebar a span {
+        display: none;
+    }
+
+    #check:checked~.sidebar a {
+        font-size: 20px;
+        margin-left: 165px;
+        width: 100%;
+    }
+
+    .content {
+        width: (100% - 250px);
+        margin-top: 60px;
+        padding: 20px;
+        margin-left: 250px;
+        background: url(background.png) no-repeat;
+        background-position: center;
+        background-size: cover;
+        height: 100vh;
+        transition: 0.5s;
+    }
+
+    #check:checked~.content {
+        margin-left: 60px;
+    }
+
+    #check:checked~.sidebar .profile_info {
+        display: none;
+    }
+
+    #check {
+        display: none;
+    }
+
+    .mobile_nav {
+        display: none;
+    }
+
+    .content .card p {
+        background: #fff;
+        padding: 15px;
+        margin-bottom: 10px;
+        font-size: 14px;
+        opacity: 0.8;
+    }
+
+    /* Responsive CSS */
+
+    @media screen and (max-width: 780px) {
+        .sidebar {
+            display: none;
+        }
+
+        #sidebar_btn {
+            display: none;
+        }
+
+        .content {
+            margin-left: 0;
+            margin-top: 0;
+            padding: 10px 20px;
+            transition: 0s;
+        }
+
+        #check:checked~.content {
+            margin-left: 0;
+        }
+
+        .mobile_nav {
+            display: block;
+            width: calc(100% - 0%);
+        }
+
+        .nav_bar {
+            background: #222;
+            width: (100% - 0px);
+            margin-top: 70px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 20px;
+        }
+
+        .nav_bar .mobile_profile_image {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+        }
+
+        .nav_bar .nav_btn {
+            color: #fff;
+            font-size: 22px;
+            cursor: pointer;
+            transition: 0.5s;
+            transition-property: color;
+        }
+
+        .nav_bar .nav_btn:hover {
+            color: #19B3D3;
+        }
+
+        .mobile_nav_items {
+            background: #2F323A;
+            display: none;
+        }
+
+        .mobile_nav_items a {
+            color: #fff;
+            display: block;
+            text-align: center;
+            letter-spacing: 1px;
+            line-height: 60px;
+            text-decoration: none;
+            box-sizing: border-box;
+            transition: 0.5s;
+            transition-property: background;
+        }
+
+        .mobile_nav_items a:hover {
+            background: #19B3D3;
+        }
+
+        .mobile_nav_items i {
+            padding-right: 10px;
+        }
+
+        .active {
+            display: block;
+        }
+    }
+</style>

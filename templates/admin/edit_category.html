@@ -1,0 +1,31 @@
+<!-- edit_category.html -->
+{% extends "admin/admin_dsh.html" %}
+{% load crispy_forms_tags %}
+{% block main %}
+<div class="container">
+    <h1>Edit Your Category</h1>
+
+    <form method="post" action="{% url 'edt_category_action' %}" class="border border-dark rounded p-4"
+        enctype="multipart/form-data">
+        {% csrf_token %}
+        <input type="hidden" value="{{category.id}}" name="category_id">
+        {{ form|crispy }}
+
+        <div class="text-right mt-3">
+            <button type="submit" class="btn btn-success">Edit Category</button>
+        </div>
+    </form>
+</div>
+<script>
+    {% if messages %}
+    document.addEventListener('DOMContentLoaded', function () {
+        {% for message in messages %}
+        Swal.fire({
+            icon: '{{ message.tags }}',
+            title: '{{ message }}',
+        });
+        {% endfor %}
+    });
+    {% endif %}
+</script>
+{% endblock main %}

@@ -1,0 +1,215 @@
+{% extends "admin/admin_dsh.html" %}
+
+{% block main %}
+<h1>Category Offer</h1>
+<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal"
+    data-bs-whatever="@getbootstrap">Add Offer
+</button>
+
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="exampleModalLabel">New message</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="couponForm">
+                    <div class="mb-3">
+                        <label for="recipient-name" class="col-form-label">Select Category</label>
+                        <select class="form-control" id="categorySelect" name="category" required>
+                            <option value="" selected disabled>Select a Category</option>
+                            {% for category in categoryData %}
+                            <option value="{{ category.id }}">
+                                {{ category.title }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                        <span class="error" id="categoryError" style="color: red;"></span>
+                    </div>
+                    <!-- Add this code to your form in the modal -->
+                    <div class="mb-3">
+                        <label for="discountType" class="col-form-label">Discount Type</label>
+                        <select class="form-control" id="discountType" name="discountType" required>
+                            <option value="percentage">Percentage</option>
+                            <option value="fixed">Fixed</option>
+                        </select>
+                    </div>
+
+
+                    <div class="mb-3">
+                        <label for="percentage" class="col-form-label">Percentage/price</label>
+                        <input type="number" class="form-control" id="percentage" min="0" max="100" name="percentage">
+                        <span class="error" id="percentageError" style="color: red;"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="startDate" class="col-form-label">Start Date:</label>
+                        <input type="date" class="form-control" id="startDate" name="startDate" required>
+                        <span class="error" id="startDateError" style="color: red;"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="endDate" class="col-form-label">End Date:</label>
+                        <input type="date" class="form-control" id="endDate" name="endDate" required>
+                        <span class="error" id="endDateError" style="color: red;"></span>
+                    </div>
+
+                    <button type="button" class="btn btn-primary" onclick="submitForm()">Submit</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<br>
+
+
+
+<div class="row p-3">
+    {% for data in offerData %}
+    <div class="col-md-4">
+        <div class="card mb-4 shadow">
+            <div class="card-body text-center bg-light">
+                <h5 class="card-title">
+                    <img src="/image/pngfind.com-offer-tag-icon-png-6701318.png" style="width: 150px; color: brown;"
+                        alt="">
+                </h5>
+                <h6 class="card-subtitle mb-2 text-muted"><b></b></h6>
+                <p class="card-text">Category Name :<b>{{ data.category.title }}</b></p>
+                {% if data.discount_type == 'fixed' %}
+                <p class="card-text">Discount Percentage: <b>{{ data.discount_value }}</b></p>
+                {% else %}
+                <p class="card-text">Discount Percentage: <b>{{ data.discount_value }}%</b></p>
+                {% endif %}
+                <p class="card-text">Coupon Type : <b>{{ data.discount_type }}</b></p>
+                <p class="card-text">End Date :<b>{{ data.expire_date|date:"Y-m-d" }}</b></p>
+                <a href="#" class="text-white" onclick="confirmDelete('{{ data.id }}')">
+                    <i class="fa-solid fa-trash fa-xl" style="color: #000000;"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<!-- Include SweetAlert in your HTML file -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11">
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+    async function submitForm() {
+        const categorySelect = document.getElementById('categorySelect');
+        const percentage = document.getElementById('percentage');
+        const startDate = document.getElementById('startDate');
+        const endDate = document.getElementById('endDate');
+
+        const discountType = document.getElementById('discountType').value;
+
+        const data = {
+            category: categorySelect.value,
+            discountType: discountType,
+            percentage: percentage.value,
+            startDate: startDate.value,
+            endDate: endDate.value
+        };
+
+        const formData = new FormData(document.getElementById('couponForm'));
+
+        try {
+            const response = await fetch('{% url "add_category_offer" %}', {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+                body: formData,
+            });
+
+
+            if (response.ok) {
+                const responseData = await response.json();
+
+                if (responseData.success) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Success',
+                        text: responseData.message,
+                    });
+                } else {
+                    console.error('Form submission error:', responseData.message);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: responseData.message,
+                    });
+                }
+            } else {
+                throw new Error('Failed to submit form');
+            }
+        } catch (error) {
+            console.error('Error:', error.message);
+            // Use SweetAlert for general errors
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'An error occurred. Please try again later.',
+            });
+        }
+    }
+
+    async function confirmDelete(offerId) {
+        Swal.fire({
+            title: 'Delete Coupon?',
+            text: 'Are you sure you want to delete the coupon?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Yes, delete it!'
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                try {
+                    const response = await fetch('{% url "delete_category_offer" offer_id=0 %}'.replace('0', offerId), {
+                        method: 'DELETE',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': '{{ csrf_token }}'
+                        },
+                    });
+
+                    if (response.ok) {
+                        const responseData = await response.json();
+
+                        if (responseData.success) {
+                            // Optionally reload the page or update the UI
+                            Swal.fire(
+                                'Deleted!',
+                                'Your coupon has been deleted.',
+                                'success'
+                            );
+                            location.reload();
+                        } else {
+                            console.error('Delete error:', responseData.message);
+                            Swal.fire(
+                                'Error!',
+                                'Failed to delete the coupon.',
+                                'error'
+                            );
+                        }
+                    } else {
+                        throw new Error('Failed to delete coupon');
+                    }
+                } catch (error) {
+                    console.error('Error:', error.message);
+                    Swal.fire(
+                        'Error!',
+                        'An error occurred while deleting the coupon.',
+                        'error'
+                    );
+                }
+            }
+        });
+        return false; // Prevent the default link behavior
+    }
+
+</script>
+{% endblock %}

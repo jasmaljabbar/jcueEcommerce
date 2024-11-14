@@ -1,0 +1,20 @@
+{% extends "admin/admin_dsh.html" %}
+{% block main %}
+
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Message</title>
+</head>
+
+<body>
+    <div class="container mt-4">
+        <h1>User Message</h1>
+        <p><strong>User:</strong> {{ user.user.username }}</p>
+        <p><strong>Message:</strong> {{ user.message }}</p>
+        <a class="btn btn-primary" href="{% url 'user_messages' %}">Back to User Messages</a>
+    </div>
+</body>
+
+{% endblock main %}

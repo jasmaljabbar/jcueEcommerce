@@ -1,0 +1,19 @@
+<!-- add_banner.html -->
+{% extends "admin/admin_dsh.html" %}
+{% load crispy_forms_tags %}
+{% block main %}
+<div class="container">
+    <h1 class="mb-4">Add New Banner</h1>
+
+    <form method="post" action="{% url 'add_banner_action' %}" class="border border-dark rounded p-4"
+        enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form|crispy }}
+
+        <div class="text-right mt-3">
+            <button type="submit" class="btn btn-success">Add Banner</button>
+        </div>
+    </form>
+</div>
+
+{% endblock main %}

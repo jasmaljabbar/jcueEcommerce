@@ -1,0 +1,45 @@
+{% extends "admin/admin_dsh.html" %}
+{% block main %}
+<div class="container">
+    <div class="my-5 p-3 bg-white border border-dark rounded">
+        <h2 class="fw-bold">Customers</h2>
+        <hr>
+        <table class="table">
+            <tr>
+                <th>Sl No.</th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Status</th>
+                <th>Action</th>
+            </tr>
+            {% for user in users %}
+
+            <tr>
+                <td>{{ forloop.counter }}</td>
+                <td>{{ user.username }}</td>
+                <td>{{ user.email }}</td>
+                <td>
+                    {% if user.is_active %}
+                        <p class="text-success fw-bold">Active</p>
+                    {% else %}
+                        <p class="text-danger fw-bold">Blocked</p>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if user.is_active %}
+                        <a href="{% url 'customeraction' user.id %}" class="btn btn-danger">Block</a>
+                    {% else %}
+                        <a href="{% url 'customeraction' user.id %}" class="btn btn-success">Unblock</a>
+                    {% endif %}
+                </td>
+            </tr>
+
+            {% endfor %}
+        </table>
+    </div>
+</div>
+
+
+{% endblock main %}
+
+

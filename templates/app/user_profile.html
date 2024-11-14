@@ -1,0 +1,153 @@
+{% extends "app/base.html" %}
+{% load static %}
+
+{% block title %}
+User Profile
+{% endblock title %}
+
+{% block main-content %}
+
+<div class="container">
+  <h1 class="h5">User Profile</h1>
+
+  <div class="row mt-4">
+    <div class="col-md-4">
+      <!-- User Information Card -->
+      <div class="card">
+        {% if request.user.userprofile.profil_photo %}
+        <div class="d-flex justify-content-center">
+          <img src="{{ request.user.userprofile.profil_photo.url }}" class="rounded-circle card-img-top my-2"
+            style="width: 200px; height: 200px; object-fit: cover;" alt="{{ request.user.username }}">
+        </div>
+        {% endif %}
+        <div class="card-body">
+          <h5 class="card-title">User Information</h5>
+          <p><strong>Name:</strong> {{ request.user.userprofile.name }}</p>
+          <p><strong>Email:</strong> {{ request.user.email }}</p>
+          <p><strong>Phone Number:</strong> {{ request.user.userprofile.phone_number }}</p>
+          <p><strong>Address:</strong> {{ request.user.userprofile.address }}</p>
+
+          <!-- Edit Profile Button -->
+          <a href="{% url 'edit_profile' %}" class="btn btn-primary">Edit Profile</a>
+
+          <!-- Change Password Button -->
+          <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#changePasswordModal">
+            Change Password
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Order History Section -->
+    <div class="col-md-8">
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title">Order History</h5>
+          <table class="table table-striped">
+            <!-- Table Headers -->
+            <thead>
+              <tr>
+                <th>Order Number</th>
+                <th>Date</th>
+                <th>Total Amount</th>
+                <!-- Add more table headers as needed -->
+              </tr>
+            </thead>
+            <tbody>
+              <!-- Order History Rows -->
+              {% if order %}
+              {% for order in order %}
+              <tr>
+                <td>{{ forloop.counter }}</td>
+                <td>{{ order.created }}</td>
+                <td>₹{{ order.total_paid }}</td>
+                <!-- Add more order details as needed -->
+              </tr>
+              {% endfor %}
+              {% else %}
+              <tr>
+                <td colspan="4">No orders yet.</td>
+              </tr>
+              {% endif %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Change Password Modal -->
+<div class="modal fade" id="changePasswordModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="exampleModalLabel">Change Password</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="password-form">
+          <div class="mb-3">
+            <label for="for-password" class="col-form-label">Old Password:</label>
+            <input type="password" class="form-control" id="old-password" required>
+          </div>
+          <div class="mb-3">
+            <label for="new-password" class="col-form-label">New Password:</label>
+            <input type="password" class="form-control" id="new-password" required>
+          </div>
+          <div class="mb-3">
+            <label for="confirm-password" class="col-form-label">Confirm Password:</label>
+            <input type="password" class="form-control" id="confirm-password" required>
+          </div>
+          <div id="password-warning" style="color: red;"></div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary" onclick="changePassword()">Change Password</button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Add this script at the end of your template -->
+<script>
+
+  function changePassword() {
+    // Get values from the form
+    var oldPassword = document.getElementById("old-password").value;
+    var newPassword = document.getElementById("new-password").value;
+    var confirmPassword = document.getElementById("confirm-password").value;
+
+    if (newPassword !== confirmPassword) {
+      document.getElementById("password-warning").innerText = "Passwords do not match.";
+      return;
+    }
+
+    document.getElementById("password-warning").innerText = "";
+
+
+    $.ajax({
+      type: 'POST',
+      url: '{% url "change_password" %}',
+      data: {
+        old_password: oldPassword,
+        new_password: newPassword,
+        csrfmiddlewaretoken: "{{ csrf_token }}",
+      },
+      success: function (response) {
+
+        alert("Password changed successfully!");
+        // Close the modal
+        $('#changePasswordModal').modal('hide');
+      },
+      error: function (xhr, errmsg, err) {
+
+        alert("Error changing password. Please try again.");
+      }
+    });
+  }
+</script>
+
+
+
+{% endblock main-content %}

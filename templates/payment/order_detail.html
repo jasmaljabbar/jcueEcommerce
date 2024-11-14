@@ -1,0 +1,107 @@
+<!-- payment/templates/payment/order_detail.html -->
+{% extends "app/base.html" %}
+{% load static %}
+
+{% block title %}
+Order Detail - {{ order.id }}
+{% endblock title %}
+
+{% block extra_css %}
+<link rel="stylesheet" type="text/css" href="{% static 'css/styles.css' %}">
+{% endblock %}
+
+{% block main-content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card order-detail-card">
+                <div class="card-body">
+
+                    <p>Order Date: {{ order.created }}</p>
+                    <p>Total Amount: ₹{{ order.total_paid }}</p>
+
+                    <h6 class="mt-4">Order Items:</h6>
+                    <ul>
+                        {% for item in order_items %}
+                        <li>
+                            <img src="{{ item.product.image1.url }}" alt="{{ item.product.name }}"
+                                style="max-width: 50px; max-height: 50px;">
+                            {{ item.product.name }} - ₹{{ item.product.price }} (Quantity: {{ item.quantity }})
+                        </li>
+                        {% endfor %}
+                    </ul>
+                    <p>payment method:{{order.billing_status}}</p>
+                    <p>Status: <span  >{{ order.status }}</span></p>
+
+
+                    {% if order.status == 'delivered' and not order.return_accepted %}
+                    {% if not order.product_returned %}
+                    <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#returnModal">
+                        Return Product
+                    </button>
+                    <!-- Modal -->
+                    <div class="modal fade" id="returnModal" tabindex="-1" role="dialog"
+                        aria-labelledby="returnModalTitle" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="returnModalTitle">Return Product</h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                            
+                                    <form method="post" action="{% url 'payment:return_order' order.id %}">
+                                        {% csrf_token %}
+                                        <label for="returnReason">Reason for Return:</label>
+                                        <textarea id="returnReason" name="reason" class="form-control"
+                                            required></textarea>
+                                        <small class="form-text text-muted">Please provide a reason for the
+                                            return.</small>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                    <button type="submit" class="btn btn-primary">Send Request</button>
+                                </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    {% endif %}
+                    {% elif order.status == 'canceled' %}
+                    <p class="text-danger">This order has been canceled.</p>
+                    {% elif order.status == 'rejected' %}
+                    <p class="text-danger">admin rejected your order.</p>
+                    {% else %}
+                    {% if order.return_request and order.return_request.admin_response == 'accepted' %}
+                    <p>Return request has been accepted. No further action required.</p>
+                    {% else %}
+                    <form method="post" action="{% url 'payment:cancel_order' order.id %}">
+                        {% csrf_token %}
+                        <input type="submit" id="cancel-order"
+                            onclick="return confirm('Do you want to cancel the order?');" value="Cancel Order"
+                            class="btn btn-danger">
+                    </form>
+                    {% endif %}
+                    {% endif %}
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+
+    var orderStatus = "{{ order.status }}";
+    var dateDelivered = new Date("{{ order.date_delivered }}");
+
+
+    if (orderStatus === 'delivered' && (new Date() - dateDelivered) / (1000 * 60 * 60 * 24) <= 2) {
+        document.getElementById('return-order').style.display = 'none';
+    }
+</script>
+
+
+{% endblock %}

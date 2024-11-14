@@ -1,0 +1,164 @@
+{% extends "admin/admin_dsh.html" %}
+
+{% block main %}
+<div class="container mt-5">
+    <h2 class="mb-4">Manage Coupons</h2>
+
+    <!-- Button to trigger modal for adding a new coupon -->
+    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addCouponModal">
+        Add Coupon
+    </button>
+
+    <!-- Modal for adding a new coupon -->
+    <div class="modal fade" id="addCouponModal" tabindex="-1" role="dialog" aria-labelledby="addCouponModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addCouponModalLabel">Add Coupon</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <!-- Your form to add a new coupon goes here -->
+                    <form method="post" action="{% url 'manage_coupons' %}" class="mt-4">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            <label for="couponName">Coupon Name:</label>
+                            <input type="text" class="form-control" id="couponName" name="coupon_name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="couponCode">Coupon Code:</label>
+                            <input type="text" class="form-control" id="couponCode" name="code" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="discountType">Discount Type:</label>
+                            <select class="form-control" id="discountType" name="discount_type" required>
+                                <option value="fixed">Fixed</option>
+                                <option value="percentage">Percentage</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="discountValue">Discount Value:</label>
+                            <input type="number" step="0.01" class="form-control" id="discountValue"
+                                name="discount_value" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="startDate">Start Date:</label>
+                            <input type="datetime-local" class="form-control" id="startDate" name="start_date" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="expireDate">Expire Date:</label>
+                            <input type="datetime-local" class="form-control" id="expireDate" name="expire_date"
+                                required>
+                        </div>
+                        <div class="form-group">
+                            <label for="couponType">Coupon Type:</label>
+                            <select class="form-control" id="couponType" name="coupon_type" required>
+                                <option value="private">Private</option>
+                                <option value="public">Public</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="minPurchaseAmount">Minimum Purchase Amount (optional):</label>
+                            <input type="number" step="0.01" class="form-control" id="minPurchaseAmount"
+                                name="min_purchase_amount">
+                        </div>
+                        <br>
+                        <button type="submit" class="btn btn-primary">Add Coupon</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card mt-4">
+        <div class="card-body">
+            <h3>Existing Coupons</h3>
+            <ul class="list-group">
+                {% for coupon in coupons %}
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <div>
+                        <strong>{{ coupon.coupon_name }}</strong> - {{ coupon.code }} - {{ coupon.discount_value }}
+                        {% if coupon.coupon_type == 'private' %}
+                        {% if request.user in coupon.users.all %}
+                        <span class="badge badge-success ml-2">You can use this coupon</span>
+                        {% else %}
+                        <span class="badge badge-warning ml-2">This coupon is private</span>
+                        {% endif %}
+                        {% endif %}
+                    </div>
+                    <div>
+                        <!-- Button to trigger modal for editing the coupon -->
+                        <a class="btn btn-warning" href="{% url 'edit_coupon' coupon.id %}">Edit</a>
+
+                        </button>
+
+                        <!-- Button to trigger modal for deleting the coupon -->
+                        <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal"
+                            data-bs-target="#deleteCouponModal{{ coupon.id }}">
+                            Delete
+                        </button>
+                    </div>
+
+                    <!-- Modal for editing the coupon -->
+
+                    <!-- Modal for editing the coupon -->
+                    <div class="modal fade" id="editCouponModal{{ coupon.id }}" tabindex="-1" role="dialog"
+                        aria-labelledby="editCouponModalLabel{{ coupon.id }}" aria-hidden="true">
+                        <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="editCouponModalLabel{{ coupon.id }}">Edit Coupon</h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Modal for deleting the coupon -->
+                    <div class="modal fade" id="deleteCouponModal{{ coupon.id }}" tabindex="-1" role="dialog"
+                        aria-labelledby="deleteCouponModalLabel{{ coupon.id }}" aria-hidden="true">
+                        <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="deleteCouponModalLabel{{ coupon.id }}">Delete Coupon
+                                    </h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                                    <!-- Your form to delete the coupon goes here -->
+                                    <form method="post" action="{% url 'delete_coupon' coupon.id %}" class="mt-4">
+                                        {% csrf_token %}
+                                        <p>Are you sure you want to delete {{ coupon.coupon_name }}?</p>
+                                        <button type="submit" class="btn btn-danger">Delete</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </li>
+                {% endfor %}
+
+            </ul>
+        </div>
+    </div>
+</div>
+<script>
+    {% if messages %}
+    document.addEventListener('DOMContentLoaded', function () {
+        {% for message in messages %}
+        Swal.fire({
+            icon: '{{ message.tags }}',
+            title: '{{ message }}',
+        });
+        {% endfor %}
+    });
+    {% endif %}
+</script>
+{% endblock %}

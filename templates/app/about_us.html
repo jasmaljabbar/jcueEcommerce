@@ -1,0 +1,80 @@
+{% extends "app/base.html" %}
+{% load static %}
+{% block title %}
+about_us
+{% endblock title %}
+
+{% block main-content %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Us</title>
+    <!-- Add your CSS styles or link to an external stylesheet here -->
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+            background-color: #f8f8f8;
+        }
+
+        header {
+            background-color: #333;
+            color: white;
+            text-align: center;
+            padding: 1em;
+        }
+
+        section {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: white;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h2 {
+            color: #333;
+        }
+
+        p {
+            line-height: 1.6;
+            color: #555;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <h1>About Us</h1>
+    </header>
+
+    <section>
+        <h2>Our Story</h2>
+        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed ac ante sit amet odio venenatis mollis.
+            Vestibulum vel eleifend mauris. Nulla facilisi. Vivamus nec neque in mi aliquam euismod nec eget ligula.
+            Proin eget ex euismod, volutpat nulla eu, efficitur sem. Duis nec est ac justo pellentesque ultricies in
+            in metus.</p>
+
+        <h2>Our Mission</h2>
+        <p>Curabitur vitae elit quis turpis cursus efficitur vel at ipsum. Integer non facilisis arcu. Etiam sed metus
+            vel orci venenatis consequat. Fusce pulvinar, quam vel iaculis accumsan, dolor odio tincidunt metus, nec
+            fringilla nulla purus nec ligula.</p>
+
+        <h2>Meet the Team</h2>
+        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed ac ante sit amet odio venenatis mollis.
+            Vestibulum vel eleifend mauris. Nulla facilisi. Vivamus nec neque in mi aliquam euismod nec eget ligula.
+            Proin eget ex euismod, volutpat nulla eu, efficitur sem.</p>
+    </section>
+</body>
+
+</html>
+
+
+
+{% endblock main-content %}

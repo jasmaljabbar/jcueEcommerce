@@ -1,0 +1,55 @@
+{% extends "admin/admin_dsh.html" %}
+
+{% block main %}
+<div class="container mt-5">
+    <h2 class="mb-4">Edit Coupon</h2>
+
+    <div class="card">
+        <div class="card-body">
+            <!-- Your form to edit the coupon goes here -->
+            <form method="post" action="{% url 'edit_coupon' coupon.id %}" class="mt-4">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label for="couponName" class="form-label">Coupon Name:</label>
+                    <input type="text" class="form-control" id="couponName" name="coupon_name" value="{{ coupon.coupon_name }}" required>
+                </div>
+                <div class="mb-3">
+                    <label for="couponCode" class="form-label">Coupon Code:</label>
+                    <input type="text" class="form-control" id="couponCode" name="code" value="{{ coupon.code }}" required>
+                </div>
+                <div class="mb-3">
+                    <label for="discountType" class="form-label">Discount Type:</label>
+                    <select class="form-control" id="discountType" name="discount_type" required>
+                        <option value="fixed" {% if coupon.discount_type == 'fixed' %}selected{% endif %}>Fixed</option>
+                        <option value="percentage" {% if coupon.discount_type == 'percentage' %}selected{% endif %}>Percentage</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label for="discountValue" class="form-label">Discount Value:</label>
+                    <input type="number" step="0.01" class="form-control" id="discountValue" name="discount_value" value="{{ coupon.discount_value }}" required>
+                </div>
+                <div class="form-group">
+                    <label for="editStartDate">Start Date:</label>
+                    <input type="datetime-local" class="form-control" id="editStartDate" name="start_date"
+                        value="{{ coupon.start_date|date:'Y-m-d\TH:i' }}" required>
+                </div>
+                <div class="mb-3">
+                    <label for="expireDate" class="form-label">Expire Date:</label>
+                    <input type="datetime-local" class="form-control" id="expireDate" name="expire_date" value="{{ coupon.expire_date|date:'Y-m-d\TH:i:s' }}" required>
+                </div>
+                <div class="mb-3">
+                    <label for="couponType" class="form-label">Coupon Type:</label>
+                    <select class="form-control" id="couponType" name="coupon_type" required>
+                        <option value="private" {% if coupon.coupon_type == 'private' %}selected{% endif %}>Private</option>
+                        <option value="public" {% if coupon.coupon_type == 'public' %}selected{% endif %}>Public</option>
+                    </select>
+                </div>
+                <!-- Add other form fields as needed -->
+
+                <button type="submit" class="btn btn-primary">Save Changes</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

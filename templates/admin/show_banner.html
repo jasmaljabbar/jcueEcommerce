@@ -1,0 +1,100 @@
+{% extends "admin/admin_dsh.html" %}
+{% block main %}
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Banners</title>
+    <!-- Include SweetAlert script -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        /* Add your CSS styles for a nice layout here */
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            /* Change from "center" to "flex-start" */
+            height: 100vh;
+            margin: 0;
+        }
+
+        .category-box {
+            border: 1px solid #ccc;
+            padding: 70px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        table {
+            width: 100%;
+        }
+
+        table th {
+            background-color: #f2f2f2;
+        }
+
+        table th,
+        table td {
+            padding: 10px;
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="category-box">
+        <h1>Banners</h1>
+
+        <!-- Display Categories in a Table -->
+        <table>
+            <thead>
+                <tr>
+                    <th>Banners Name</th>
+                    <th>Image</th>
+                    <th>Action</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for banner in banners %}
+                <!-- Categories will be displayed here dynamically -->
+                <tr>
+                    <td>{{ banner.title }}</td>
+                    <td>
+                        {% if banner.image %}
+                        <img src="{{ banner.image.url }}" alt="{{ banner.title }} Image"
+                            style="width: auto; height: 50px;">
+                        {% else %}
+                        No Image Available
+                        {% endif %}
+                    </td>
+                    <td>
+                        <a href="{% url 'edit_banner' banner.id %}" class="btn btn-success">Edit</a>
+                    </td>
+                    <td>
+                        {% if banner.is_active %}
+                        <a href="{% url 'banner_action' banner.id %}" class="btn btn-success"> Active</a>
+                        {% else %}
+                        <a href="{% url 'banner_action' banner.id %}" class="btn btn-danger">Not Active</a>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <p><a href="{% url 'add_banner' %}" class="btn btn-success">Add Banner</a></p>
+    </div>
+    <script>
+        {% if messages %}
+        document.addEventListener('DOMContentLoaded', function () {
+            {% for message in messages %}
+            Swal.fire({
+                icon: '{{ message.tags }}',
+                title: '{{ message }}',
+            });
+            {% endfor %}
+        });
+        {% endif %}
+    </script>
+    {% endblock main %}

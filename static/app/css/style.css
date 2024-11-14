@@ -1,0 +1,58 @@
+.rubics_home1 img{
+    width: 100%;
+}
+
+#sticky-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1000; /* Adjust the z-index as needed */
+  }
+  
+  
+
+.home_rub{
+    background-color: #fff;background-image: linear-gradient(#fff7ef,#fff);
+    background-image: -webkit-linear-gradient(#fff7ef,#fff);
+    background-image: -moz-linear-gradient(#fff7ef,#fff);
+    background-image: -ms-linear-gradient(#fff7ef,#fff);
+    background-image: -o-linear-gradient(#fff7ef,#fff);
+    padding: 50px 40px;
+    border:1px solid #efe8e1;
+    padding-bottom: 20px;
+}
+.smbg{
+    background-color: #fff;
+    background-image: linear-gradient(rgba(110, 69, 143,0.1),#fff);
+    background-image: -webkit-linear-gradient(rgba(110, 69, 143,0.1),#fff);
+    background-image: -moz-linear-gradient(rgba(110, 69, 143,0.1),#fff);
+    background-image: -ms-linear-gradient(rgba(110, 69, 143,0.1),#fff);
+    background-image: -o-linear-gradient(rgba(110, 69, 143,0.1),#fff);
+
+}
+.mir{
+    background-color: #fff;
+    background-image: linear-gradient(rgba(10, 77, 123,0.1),#fff);
+    background-image: -webkit-linear-gradient(rgba(10, 77, 123,0.1),#fff);
+    background-image: -moz-linear-gradient(rgba(10, 77, 123,0.1),#fff);
+    background-image: -ms-linear-gradient(rgba(10, 77, 123,0.1),#fff);
+    background-image: -o-linear-gradient(rgba(10, 77, 123,0.1),#fff);
+
+}
+.mlkpro{
+    color: #636362;
+    font-size: 22px;
+    line-height: 22px;
+    margin-bottom: 15px;
+    width: 43%;
+    margin: 0 auto;
+    text-align: center;
+}
+.goodnesssec{
+    text-decoration: none;
+}
+
+.filter_box{
+    background-color: red;
+}

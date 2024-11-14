@@ -1,0 +1,96 @@
+{% extends "admin/admin_dsh.html" %}
+{% block main %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Admin Category View</title>
+    <style>
+        /* Add your CSS styles for a nice layout here */
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: flex-start; /* Change from "center" to "flex-start" */
+            height: 100vh;
+            margin: 0;
+        }
+
+        .category-box {
+            border: 1px solid #ccc;
+            padding: 70px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        table {
+            width: 100%;
+        }
+
+        table th {
+            background-color: #f2f2f2;
+        }
+
+        table th, table td {
+            padding: 10px;
+            text-align: center;
+        }
+
+        .back-button {
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="category-box">
+        <h1>Category Management</h1>
+
+        <!-- Back Button -->
+        <p class="back-button">
+            <a href="javascript:history.back()" class="btn btn-primary">Back</a>
+        </p>
+
+        <!-- Display Categories in a Table -->
+        <table>
+            <thead>
+                <tr>
+                    <th>Category Name</th>
+                    <th>Image</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for cat in category %}
+                    <tr>
+                        <td>{{ cat.title }}</td>
+                        <td>
+                            {% if cat.image %}
+                                <img src="{{ cat.image.url }}" alt="{{ cat.title }} Image" style="width: auto; height: 50px;">
+                            {% else %}
+                                No Image Available
+                            {% endif %}
+                        </td>
+                        <td>
+                            <a href="{% url 'edit_category' cat.id %}" class="btn btn-success">Edit</a>
+                  
+                        </td>
+                        <td>
+                            {% if cat.active %}
+                            
+                            <a href="{% url 'category_action' cat.id %}" class="btn btn-success"> Available</a>
+                          
+                            {% else %}
+                        
+                            <a href="{% url 'category_action' cat.id %}" class="btn btn-danger">Not Available</a>
+                            
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <!-- Add Category Button -->
+        <p><a href="{% url 'add_category' %}" class="btn btn-success">Add Category</a></p>
+    </div>
+</body>
+</html>
+{% endblock main %}

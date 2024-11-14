@@ -1,0 +1,40 @@
+{% extends "admin/admin_dsh.html" %}
+
+{% block extrastyle %}
+
+{% endblock %}
+
+{% block main %}
+<table class="table table-success table-striped">
+    <caption>Coupon List</caption>
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Code</th>
+            <th>Discount</th>
+            <th>Expire Date</th>
+            <th>Coupon Type</th>
+            <th>Min Purchase Amount</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for coupon in coupons %}
+        <tr>
+            <td>{{ coupon.id }}</td>
+            <td>{{ coupon.code }}</td>
+            <td>{{ coupon.discount }}</td>
+            <td>{{ coupon.expire_date|date:"M d, Y" }}</td>
+            <td>{{ coupon.coupon_type }}</td>
+            <td>{{ coupon.min_purchase_amount }}</td>
+            <td class="actions">
+                <a btn btn-success href="{% url 'edit_coupon' coupon.id %}" class="btn btn-secondary">Edit</a>
+                <a href="#" class="btn btn-danger">Delete</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+<p><a href="{% url 'add_coupon_admin' %}" class="btn btn-success">Add Coupon</a></p>
+
+{% endblock %}

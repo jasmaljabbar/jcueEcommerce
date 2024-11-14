@@ -1,0 +1,356 @@
+{% extends "app/base.html" %}
+{% load static %}
+{% block title %}
+Products
+{% endblock title %}
+
+{% block main-content %}
+
+<style>
+  body {
+    text-align: center;
+    overflow-x: hidden;
+    font-family: 'Noto Sans JP', sans-serif;
+  }
+
+  .image-container {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+  }
+
+  .image-item {
+    margin: 10px;
+    text-align: center;
+  }
+
+  .image-button {
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    cursor: pointer;
+    overflow: hidden;
+    max-width: 80px;
+  }
+
+  .image-button img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+    transition: transform 0.3s ease-in-out;
+  }
+
+  .wishlist-icon {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 24px;
+
+    cursor: pointer;
+  }
+
+  .image-button:hover img {
+    transform: scale(1.1);
+  }
+
+  .image-name {
+    margin-top: 5px;
+    font-size: 12px;
+  }
+
+  .container {
+    margin-top: 30px;
+  }
+
+  .product-card {
+    background-color: #f5f6fa;
+    border-radius: 10px;
+    color: #2f3640;
+    margin: 0 2em;
+    transition: all linear .2s;
+    width: 250px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    position: relative;
+    height: 350px;
+    /* Increased height */
+  }
+
+  .product-card:hover,
+  .product-card:active {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    transform: scale(1.05);
+  }
+
+  .product-img {
+    border-radius: 10px;
+    height: 250px;
+    /* Increased height */
+    max-width: 100%;
+    background-size: cover;
+    background-position: center;
+    transition: transform 0.3s ease-in-out;
+  }
+
+  .product-card:hover .product-img {
+    transform: scale(1.1);
+  }
+
+  .product-details {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 1em;
+    text-align: center;
+    background-color: rgba(255, 255, 255, 0.9);
+  }
+
+  .product-details h4 {
+    font-size: 16px;
+    margin-bottom: 10px;
+  }
+
+  .product-cart button {
+    border: 0;
+    border-radius: 0 0 10px 10px;
+
+    cursor: pointer;
+    font-family: inherit;
+    padding: 1em;
+    text-transform: uppercase;
+
+    width: 100%;
+    transition: background-color 0.3s ease-in-out;
+  }
+
+  .product button:hover {
+    background-color: #2980b9;
+    font-weight: 500;
+    letter-spacing: .1em;
+  }
+</style>
+
+<div class="row p-3">
+  <div class="col-md-2">
+    <div class="card">
+      <div class="card-body">
+        <h5 class="card-title">Filter Options</h5>
+        <!-- Price Range Filter -->
+        <form method="post" action="{% url 'price_filter' %}">
+          {% csrf_token %}
+          <label for="min_price">Min Price:</label>
+          <input type="number" name="min_price" id="min_price" placeholder="Min" />
+
+          <label for="max_price">Max Price:</label>
+          <input type="number" name="max_price" id="max_price" required placeholder="Max" />
+          </select>
+
+          <button type="submit" class="btn btn-primary mt-3">Apply Filters</button>
+        </form>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-10 mx-auto py-5">
+    <div class="row">
+      {% if product %}
+      {% for p in product %}
+    {% if p.active %}
+    <div class="col-md-3 col-sm-6 mb-4">
+      <div class="product-card">
+        <div class="product-img">
+          {% if p.in_wishlist_count %}
+
+          <a href="{% url 'basket:add_to_wishlist' p.id %}">
+
+
+            <i class="fas fa-heart wishlist-icon " style="color: red;"></i>
+          </a>
+          {% else %}
+          {% if request.user.is_authenticated %}
+          <a href="{% url 'basket:add_to_wishlist' p.id %}">
+            {% endif %}
+            <i class="fas fa-heart wishlist-icon"></i>
+          </a>
+          {% endif %}
+          <a href="{% url 'view_product' p.id %}">
+            <img src="{{ p.image1.url }}" class="card-img-top" alt="{{ p.name }}">
+          </a>
+        </div>
+        <div class="product-details">
+          {% if p.old_price %}
+            <p class="text-capitalize">
+              ₹ {{ p.price }} <del><small>₹{{ p.old_price }}</small></del>
+            </p>
+          {% else %}
+            <p class="text-capitalize">₹ {{ p.price }}</p>
+          {% endif %}
+          <h4>{{ p.title }}</h4>
+          {% if p.stock > 0 %}
+            <div class="product-cart">
+              {% if p.in_basket %}
+                <a href="{% url 'basket:basket_summary' %}">
+                  <button type="button" class="btn btn-primary">Go to Cart</button>
+                </a>
+              {% else %}
+                <button type="button" class="add-to-cart-button btn btn-primary" data-productid="{{ p.id }}">Add to Cart</button>
+              {% endif %}
+            </div>
+          {% else %}
+            <div class="product-cart">
+              <button class="btn-danger">Out of Stock</button>
+            </div>
+          {% endif %}
+        </div>
+        
+      </div>
+    </div>
+    {% endif %}
+    {% endfor %}
+      {% else %}
+      <!-- Your code for when product is empty -->
+      <div class="col-md-12">
+        <!-- No Result Component Start -->
+        <div
+          class="container flex flex-wrap justify-between items-center mx-auto bg-white rounded-md dark:bg-slate-500">
+          <div class="text-center border-dashed border-2 border-slate-200 dark:border-slate-100 rounded-m">
+            <p class="text-xl mb-2 uppercase font-bold dark:text-white">No Result</p>
+            <span class="text-m text-slate-400 block mb-10 dark:text-slate-50">Sorry, that product is not
+              available</span>
+          </div>
+        </div>
+        <!-- No Result Component End  -->
+
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+
+<script>
+  $(document).ready(function () {
+    $(".thumbnail-image").click(function () {
+      var newImageSrc = $(this).attr("src");
+      $(".selected-image").attr("src", newImageSrc);
+    });
+
+    $(".add-to-cart-button").click(function () {
+      var productId = $(this).data("productid");
+
+      $.ajax({
+        type: 'POST',
+        url: '{% url "basket:basket_add" %}',
+        data: {
+          productid: productId,
+          productqty: 1,
+          csrfmiddlewaretoken: "{{csrf_token}}",
+          action: 'post'
+        },
+        success: function (json) {
+          window.location.reload();
+          document.getElementById("basket-qty").innerHTML = json.qty;
+        },
+        error: function (xhr, errmsg, err) {
+          // Handle error if needed
+        }
+      });
+    });
+  });
+</script>
+<style>
+  body {
+    overflow-x: hidden;
+
+  }
+
+  .product-card {
+    border: 1px solid #e1e1e1;
+    border-radius: 5px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+    transition: all 0.2s ease;
+    position: relative;
+  }
+
+  .badge-container {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+  }
+
+  .badge {
+    background-color: #4caf50;
+    color: #fff;
+    padding: 5px 10px;
+    border-radius: 5px;
+  }
+
+  .heart-icon {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    color: #f00;
+  }
+
+  .product-card-body {
+    padding: 15px;
+  }
+
+  .product-brand {
+    color: #555;
+  }
+
+  .product-name {
+    font-weight: 500;
+    margin-top: 5px;
+  }
+
+  .price {
+    margin-top: 10px;
+  }
+
+  .discount-price {
+    display: flex;
+    align-items: center;
+  }
+
+  .selling-price {
+    color: #E90303;
+    font-size: 16px;
+  }
+
+  .discount-tag {
+    background-color: #4caf50;
+    color: #fff;
+    padding: 5px;
+    margin-left: 5px;
+  }
+
+  .original-price {
+    color: #aaa;
+    text-decoration: line-through;
+    margin-left: 10px;
+  }
+
+  .action-buttons {
+    margin-top: 15px;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .btn {
+    padding: 8px 16px;
+    border-radius: 5px;
+  }
+
+  .btn-sm {
+    padding: 6px 12px;
+  }
+</style>
+
+{% endblock main-content %}

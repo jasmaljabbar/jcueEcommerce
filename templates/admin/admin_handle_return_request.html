@@ -1,0 +1,28 @@
+<!-- admin_handle_return_request.html -->
+{% extends "admin/admin_dsh.html" %}
+{% block main %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title text-center">Handle Return Request - Order ID: {{ return_request.order.id }}</h5>
+                    <p>Customer: {{ return_request.order.full_name }}</p>
+                    <p>Return Request Status: {{ return_request.admin_response|default:"Pending" }}</p>
+                    <!-- Display other return request details as needed -->
+
+                    <form method="post" action="{% url 'admin_handle_return_request' return_request.id %}">
+                        {% csrf_token %}
+                        <label for="response">Admin Response:</label>
+                        <select name="response" id="response" required>
+                            <option value="accepted">Accept</option>
+                            <option value="rejected">Reject</option>
+                        </select>
+                        <button type="submit" class="btn btn-primary">Submit Response</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

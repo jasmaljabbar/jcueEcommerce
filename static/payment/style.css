@@ -1,0 +1,16 @@
+/* static/css/styles.css */
+
+/* Fade-in animation */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+/* Apply the animation to the order detail card */
+.order-detail-card {
+    animation: fadeIn 0.5s ease-in-out;
+}
