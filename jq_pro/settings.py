@@ -36,7 +36,7 @@ LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
 
 
-
+SITE_ID = 1
 
 
 
@@ -57,6 +57,7 @@ INSTALLED_APPS = [
     'basket.apps.BasketConfig',
     'payment.apps.PaymentConfig',
     'orders.apps.OrdersConfig',
+    'django.contrib.sites',
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
@@ -199,27 +200,15 @@ EMAIL_HOST_PASSWORD = 'lcpx hcyb naxq fbub'
 
 AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
+    'allauth.account.auth_backends.AuthenticationBackend',
   
 
 
 ]
 
-SOCIALACCOUNT_PROVIDERS = {
-    'google': {
-        'APP': {
-            'client_id': '51708528377-ec0pps4kfd8hhn1o9p5jhrbaphdfbmu9.apps.googleusercontent.com',
-            'secret': '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',
-        },
-        'SCOPE': [
-            'profile',
-            'email',
-        ],
-        'AUTH_PARAMS': {
-            'access_type': 'online',
-        },
-        'OAUTH_PKCE_ENABLED': True,
-    }
-}
+
+
+SOCIALACCOUNT_QUERY_EMAIL = True
 
 SOCIALACCOUNT_LOGIN_ON_GET=True
 
