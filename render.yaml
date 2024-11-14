@@ -1,0 +1,8 @@
+services:
+  - type: web
+    plan: free
+    name: jq_pro
+    runtime: python
+    buildCommand: "./build.sh"
+    startCommand: "python -m gunicorn jq_pro.asgi:application -k uvicorn.workers.UvicornWorker"
+    
