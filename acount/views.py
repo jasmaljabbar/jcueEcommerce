@@ -23,6 +23,8 @@ from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.hashers import check_password
 
 
+
+
 def home(request):
     product = Product.objects.all()[:12]
     active_banners = Banner.objects.filter(is_active=True)
@@ -150,18 +152,24 @@ def otp_perform(request):
         otp = request.POST.get("otp")
         user_data = request.session.get("user_data")
         otp_key = request.session.get("otp_key")
-        print(otp_key)
         otp_valid = request.session.get("otp_valid")
+        
         if otp_key and otp_valid is not None:
             valid_otp = datetime.fromisoformat(otp_valid)
             if valid_otp > datetime.now():
                 totp = pyotp.TOTP(otp_key, interval=60)
                 if totp.verify(otp):
+                    # Create the user and authenticate it
                     user = User.objects.create_user(**user_data)
-                    request.session["user"] = user.email
-                    login(request, user)
-                    clear_session(request)
-                    return redirect("user_login")
+                    # If authentication is successful, log the user in
+                    user = authenticate(request, username=user_data['username'], password=user_data['password'])
+                    if user:
+                        login(request, user)
+                        clear_session(request)
+                        return redirect("home")
+                    else:
+                        messages.error(request, "Authentication failed")
+                        return redirect("otp")
                 else:
                     messages.error(request, "OTP invalid")
                     return redirect("otp")
@@ -171,7 +179,7 @@ def otp_perform(request):
                 return redirect("sign_up")
         else:
             clear_session(request)
-            messages.error(request, "Didnt get any otp")
+            messages.error(request, "Didn’t get any OTP")
             return redirect("sign_up")
     else:
         clear_session(request)
